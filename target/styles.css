@@ -121,6 +121,11 @@ section.feature img {
   margin-bottom: 0.35rem;
 }
 
+.emphasis-red {
+  color: #c62828;
+  font-weight: 700;
+}
+
 .desc-block a {
   color: var(--teal-dark);
   text-decoration: underline;

@@ -23,7 +23,9 @@
   1. 於 `<nav class="toc">` 加入一個指向該功能區塊的導覽連結(`<a href="#錨點">`)。
   2. 於 `<main>` 新增一個 `<section class="feature" id="錨點">`,包含標題、`images/` 下對應截圖,以及中英文 `desc-block` 說明區塊。
   3. 將截圖從 `/source` 複製一份到 `/target/images/`,檔名與 `/source` 保持一致。
-- `_desc.md` 若有更新,需同步更新 `index.html` 對應區塊的中英文文字,不可只改單一語言。
+- `/source` 內每個說明 `.md` 都必須保留成對的中文與英文內容；若目前只有中文,修改來源檔時需先補上對應英文,再同步更新 `index.html`,不可只在 `index.html` 補英文。
+- `.md` 若有更新,需同步更新 `index.html` 對應區塊的中英文文字,不可只改單一語言。
+- `/source` 內的 `.md` 說明文字若包含 Markdown 粗體語法 `**xxx**`,產生或更新 `index.html` 時需將 `xxx` 轉為粗體且紅色顯示,不論內容使用中文、英文或其他語言；請使用具語意的 HTML 標記(例如 `<strong class="emphasis-red">xxx</strong>`)並確保 `target/styles.css` 為該標記設定紅色與粗體樣式,不可在頁面上顯示 `**` 符號。
 
 ## 多語系需求
 - 此網頁的目的是讓**非中文使用者**也能看懂如何操作政府電子採購網,因此每個頁面/章節的說明文字都須提供英文版本。
