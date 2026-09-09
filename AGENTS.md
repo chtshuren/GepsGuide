@@ -33,6 +33,34 @@
 - `/更新html`: 將 `/source` 中新增或更新的圖片與 `.md` 內容同步補進 `/target/index.html` 及 `/target/images/`,並確認頁面內容、雙語文字與換行格式正確；完成後提供可供使用者確認的頁面結果。此指令不包含 commit 或 push。
 - `/更新page`: 在完成 `/更新html` 並確認頁面正常後,允許建立 commit,並將更新推送到 `main` 與 `gh-pages` 分支。推送前需確認變更內容與目標分支,不可將未確認的素材或頁面變更直接發布。
 
+### `main` 與 `gh-pages` 的發布差異
+- `main` 是完整專案分支,包含 `AGENTS.md`、`source/`、`target/` 及其他專案檔案；網站檔案位於 `main` 的 `target/` 子目錄。
+- `gh-pages` 是 GitHub Pages 部署分支,根目錄必須直接包含 `index.html`、`styles.css` 與 `images/`。它的根目錄內容應等於 `main:target/`,不可把完整 `main` 分支直接推上去,也不可讓網站變成 `gh-pages/target/index.html`。
+- 因此 `main` 與 `gh-pages` 的 commit SHA 不需要相同；應比較 `git rev-parse main:target` 與 `git rev-parse origin/gh-pages^{tree}` 是否相同,確認部署內容一致。
+- `gh-pages` 的歷史可能與 `main` 分叉。不要直接執行 `git push origin main:gh-pages` 或用一般 merge 取代部署根目錄；使用 `target/` 建立部署快照,並以 `--force-with-lease` 更新遠端,避免覆蓋未預期的遠端更新。
+
+### `/更新page` 發布檢查與推送流程
+1. 先確認工作樹與變更範圍:
+  `git status --short --branch`
+  `git diff --check`
+  確認只包含已由使用者確認的 `source/`、`target/` 或必要的專案檔案。
+2. 完成 `/更新html` 並確認頁面後,提交完整專案到 `main`:
+  `git add source target`
+  `git commit -m "Update procurement guide page"`
+  `git push origin main`
+3. 從同一個 `main` 提交產生 `gh-pages` 部署快照。先更新遠端追蹤資訊:
+  `git fetch origin gh-pages`
+4. 使用唯一的暫存分支將 `target/` 放到部署根目錄,再安全推送:
+  `git subtree split --prefix target -b publish-gh-pages-<commit-id>`
+  `git push --force-with-lease origin publish-gh-pages-<commit-id>:gh-pages`
+  `git branch -D publish-gh-pages-<commit-id>`
+  `<commit-id>` 請替換為本次 `main` commit 的短 SHA,避免覆蓋既有暫存分支。
+5. 推送後驗證:
+  `git fetch origin gh-pages`
+  `git rev-parse main:target`
+  `git rev-parse origin/gh-pages^{tree}`
+  兩個 tree SHA 必須相同,且 `git status --short --branch` 應顯示工作樹乾淨。
+
 ## 多語系需求
 - 此網頁的目的是讓**非中文使用者**也能看懂如何操作政府電子採購網,因此每個頁面/章節的說明文字都須提供英文版本。
 - 建議中英文並列呈現(例如中文段落後緊接對應英文翻譯,或提供語言切換),避免只放中文而讓非中文使用者無法理解。
